@@ -199,7 +199,7 @@
 #pragma mark - Notifications
 - (void)textDidBeginEditing:(NSNotification *)notification
 {
-    if ([self.text isEqualToString:_placeholder]) {
+    if ([self.text isEqualToString:_placeholder] && notification.object == self) {
         self.text = nil;
         self.textColor = _storedTextColor;
     }
@@ -207,7 +207,7 @@
 
 - (void)textDidEndEditing:(NSNotification *)notification
 {
-    if (![self.text length]) {
+    if (![self.text length] && notification.object == self) {
         self.text = [self placeholder];
         self.textColor = [self placeholderTextColor];
     }
@@ -215,20 +215,22 @@
 
 - (void)textDidChange:(NSNotification *)notification
 {
-    if ([self.text length]) {
-        
-        _storedText = [self text];
-        
-        if (![_floatLabel alpha]) {
-            [self toggleFloatLabel:UIFloatLabelAnimationTypeShow];
+    if (notification.object == self) {
+        if ([self.text length]) {
+
+            _storedText = [self text];
+
+            if (![_floatLabel alpha]) {
+                [self toggleFloatLabel:UIFloatLabelAnimationTypeShow];
+            }
+
+        } else {
+            if ([_floatLabel alpha]) {
+                [self toggleFloatLabel:UIFloatLabelAnimationTypeHide];
+            }
+
+            _storedText = @"";
         }
-        
-    } else {
-        if ([_floatLabel alpha]) {
-            [self toggleFloatLabel:UIFloatLabelAnimationTypeHide];
-        }
-        
-        _storedText = @"";
     }
 }
 
